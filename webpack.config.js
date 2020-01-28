@@ -1,4 +1,4 @@
-module.exports = function(env, argv) {
+module.exports = function(env = {}, argv) {
   const path = require('path')
   const webpack = require('webpack')
   const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -6,25 +6,25 @@ module.exports = function(env, argv) {
   const plugins = []
   const projectPath = path.resolve(__dirname, './')
 
-  // const isProd = argv.mode === 'production'
-  const isMock = process.env.API_MOCK === '1'
+  const isMock = env.API_MOCK === 1
   const entry = {}
 
   const dir = {
     project: projectPath,
     src: path.join(projectPath, 'src'),
+    // build: path.join(projectPath, 'docs'),
     mocks: path.join(projectPath, 'src/__mocks__'),
   }
 
   plugins.push(
     new webpack.EnvironmentPlugin({
       NODE_ENV: argv.mode || 'development',
-      API_MOCK: process.env.API_MOCK,
     })
   )
 
   plugins.push(
     new HtmlWebpackPlugin({
+      template: `${dir.mocks}/index.ejs`,
       title: 'TOP画面',
       filename: 'index.html',
     })
@@ -33,16 +33,16 @@ module.exports = function(env, argv) {
   plugins.push(
     new CopyWebpackPlugin([
       {
-        from: `${dir.mocks}/ajax/`,
-        to: `${dir.build}/ajax/`,
+        from: `${dir.mocks}/api/`,
+        to: `api`,
       },
     ])
   )
 
   entry.index = [`${dir.src}/index.js`]
 
-  if (process.env.API_MOCK === '1') {
-    entry.index.unshift(`src/__mocks__/apiMocker.js`)
+  if (isMock) {
+    entry.index.unshift(`${dir.mocks}/apiMocker.js`)
   }
 
   return {
@@ -50,7 +50,6 @@ module.exports = function(env, argv) {
     entry,
     output: {
       filename: '[name].js',
-      path: dir.build,
       publicPath: '/',
     },
     module: {
@@ -71,7 +70,7 @@ module.exports = function(env, argv) {
     plugins: plugins,
     devServer: {
       contentBase: dir.build,
-      port: 8000,
+      port: 8080,
       host: '0.0.0.0',
       inline: true,
     },

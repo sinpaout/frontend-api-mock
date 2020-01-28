@@ -1,0 +1,6 @@
+{
+  "count": 87,
+  "next": "https://swapi.co/api/people/?page=2&format=json",
+  "previous": null,
+  "results": []
+}

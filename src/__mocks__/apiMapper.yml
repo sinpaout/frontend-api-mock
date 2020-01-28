@@ -1,0 +1,14 @@
+default: &default
+  description: Default
+  api: &api
+    /api/people: /api/peoples.json
+    /api/planets: /api/planets.json
+
+noData:
+  # defaultを上書き
+  <<: *default
+  description: No data
+  api:
+    # apiを上書き
+    <<: *api
+    /api/people: /api/peoples-no-data.json
